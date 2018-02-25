@@ -22,29 +22,34 @@ function int_array(arr) {
     return intArr;
 }
 
-var leftMargin = 100;
-var topMargin = 50;
-
 var plotHeight = 350;
 var plotWidth = 500;
 
-function setup() {
-    createCanvas(plotHeight+leftMargin+100, plotWidth+topMargin+100);
-
-    frameRate(10);
-
-    var v = {
-        .pos = 0,
-        .disp = 0,
-        .pos_x = 0, // start with random
-        .pos_y = 0 // start with random
-    };
-
-    var e  = {
-        .u = ...,
-        .v = ...
-    };
+class Vertex {
+    constructor(id) {
+        this.id = id;
+        this.pos = 0;
+        this.disp = 0;
+        this.pos_x = int(random(plotWidth));
+        this.pos_y = int(random(plotHeight));
+    }
 }
+
+function create_vertex(id) {
+    return new Vertex(id);
+}
+
+class Edge {
+    constructor(u, v) {
+        this.u = u;
+        this.v = v;
+    }
+}
+
+function create_edge(u, v) {
+    return new Edge(u, v);
+}
+
 
 function fr91(W, L, V, E, iterations) {
     var area = W * L;
@@ -93,8 +98,55 @@ function fr91(W, L, V, E, iterations) {
     } // for i
 }
 
+function setup() {
+    createCanvas(plotHeight+10, plotWidth+10);
+
+    //frameRate(10);
+    noLoop();
+
+    // Prepare data
+    var rows = table.getRows();
+    var vertices = { };
+    var edges = [ ];
+
+    for (var i = 0 ; i < rows.length ; i++) {
+        var u_id = int(rows[i].getNum(0));
+        var v_id = int(rows[i].getNum(1));
+        if (!vertices.hasOwnProperty(u_id)) {
+            vertices[u_id] = create_vertex(u_id);
+        }
+        if (!vertices.hasOwnProperty(v_id)) {
+            vertices[v_id] = create_vertex(v_id);
+        }
+
+        var u = vertices[u_id];
+        var v = vertices[v_id];
+        edges.push(create_edge(u, v));
+    }
+
+    console.log('vertices', vertices);
+    console.log('edges', edges);
+    
+    // Execute algorithm
+    var W = plotWidth;
+    var L = plotHeight;
+    var V = vertices;
+    var E = edges;
+    var iterations = 100;
+
+    fr91(W, L, V, E, iterations);
+
+    // Draw
+    textAlign(CENTER);
+    for (var v in V) {
+        var x = v.pos_x;
+        var y = v.pos_y;
+        point(x, y);
+        text(v.id, x, y-5);
+    }
+}
+
 function draw() {
     background(255);
 
-    
 }
