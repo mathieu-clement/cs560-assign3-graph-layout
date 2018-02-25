@@ -6,7 +6,7 @@ var iteration = 0;
 var iterations = 100;
 
 function preload() {
-    table = loadTable('/data/facebook/0.edges.csv', 'csv');
+    table = loadTable('/data/facebook/686.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
@@ -69,8 +69,8 @@ function fr91(W, L, V, E) {
     for (var v in V) V_length++;
     var k = sqrt(area/V_length);
     var k2 = k*k;
-    var fa = function(x) { return (x*x)/k; }
-    var fr = function(x) { return x==0 ? 0 : -k2/x; }
+    var fa = function(x) { return x*x/k; }
+    var fr = function(x) { return x==0 ? 0 : k2/x; }
 
     var cool = function(x) { return t*0.9; }
 
@@ -84,11 +84,11 @@ function fr91(W, L, V, E) {
                 var u = V[l];
                 var delta_x = v.pos_x - u.pos_x;
                 var delta_y = v.pos_y - u.pos_y;
-                var delta_norm = vector_norm(delta_x, delta_y);
-                var ddx = delta_x == 0 ? 0 : delta_x/delta_norm;
-                var ddy = delta_y == 0 ? 0 : delta_y/delta_norm;
-                v.disp_x = v.disp_x + ddx * fr(delta_norm);
-                v.disp_y = v.disp_y + ddy * fr(delta_norm);
+                var dist = vector_norm(delta_x, delta_y);
+                if (dist > 0) {
+                    v.disp_x = v.disp_x + delta_x/dist * fr(dist);
+                    v.disp_y = v.disp_y + delta_y/dist * fr(dist);
+                }
             }
         }
     } 
@@ -98,15 +98,15 @@ function fr91(W, L, V, E) {
         var e = E[j];
         var lambda_x = e.v.pos_x - e.u.pos_x;
         var lambda_y = e.v.pos_y - e.u.pos_y;
-        var lambda_norm = vector_norm(lambda_x, lambda_y);
-        var llx = lambda_x == 0 ? 0 : lambda_x/lambda_norm;
-        var lly = lambda_y == 0 ? 0 : lambda_y/lambda_norm;
-        var ax = llx * fa(lambda_norm);
-        var ay = lly * fa(lambda_norm);
-        e.v.disp_x = e.v.disp_x - ax;
-        e.v.disp_y = e.v.disp_y - ay;
-        e.u.disp_x = e.u.disp_x + ax;
-        e.u.disp_y = e.u.disp_y + ay;
+        var dist = vector_norm(lambda_x, lambda_y);
+        if (dist > 0) {
+            var ax = lambda_x/dist * fa(dist);
+            var ay = lambda_y/dist * fa(dist);
+            e.v.disp_x -= ax;
+            e.v.disp_y -= ay;
+            e.u.disp_x += ax;
+            e.u.disp_y += ay;
+        }
     }
 
     // Limit max displacement to temperature t and 
@@ -116,8 +116,8 @@ function fr91(W, L, V, E) {
         var v_disp_norm = vector_norm(v.disp_x, v.disp_y);
         var ddx = v.disp_x==0 ? 0 : v.disp_x/v_disp_norm;
         var ddy = v.disp_y==0 ? 0 : v.disp_y/v_disp_norm;
-        v.pos_x = v.pos_x + ddx * min(v.disp_x, t);
-        v.pos_y = v.pos_y + ddy * min(v.disp_y, t);
+        v.pos_x += ddx * min(v.disp_x, t);
+        v.pos_y += ddy * min(v.disp_y, t);
         v.pos_x = min(W, max(-W/2, v.pos_x));
         v.pos_y = min(L, max(-L/2, v.pos_y));
     } 
@@ -131,7 +131,7 @@ function setup() {
     createCanvas(plotWidth+10, plotHeight+10);
     randomSeed(100);
 
-    frameRate(10);
+    frameRate(24);
 
     // Prepare data
     var rows = table.getRows();
@@ -165,6 +165,8 @@ function draw() {
     if (t > 0 && iteration < iterations) {
         fr91(W, L, V, E);
         iteration++;
+    } else {
+        noLoop();
     }
 
     // Draw
