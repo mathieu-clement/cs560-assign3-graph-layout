@@ -1,4 +1,9 @@
 var table; // data loaded from csv
+var vertices = { };
+var edges = [ ];
+var t = 20.0;
+var iteration = 0;
+var iterations = 100;
 
 function preload() {
     table = loadTable('/data/facebook/0.edges.csv', 'csv');
@@ -22,8 +27,8 @@ function int_array(arr) {
     return intArr;
 }
 
-var plotWidth = 1500;
-var plotHeight = 1000 ;
+var plotWidth = 1200;
+var plotHeight = 600;
 
 class Vertex {
     constructor(id) {
@@ -43,6 +48,10 @@ class Edge {
     constructor(u, v) {
         this.u = u;
         this.v = v;
+        // color
+        this.r = random(256);
+        this.g = random(256);
+        this.b = random(256);
     }
 }
 
@@ -54,83 +63,78 @@ function vector_norm(x, y) {
     return sqrt(x*x + y*y);
 }
 
-function fr91(W, L, V, E, iterations) {
+function fr91(W, L, V, E) {
     var area = W * L;
     var V_length = 0;
     for (var v in V) V_length++;
     var k = sqrt(area/V_length);
     var k2 = k*k;
     var fa = function(x) { return (x*x)/k; }
-    var fr = function(x) { return x==0 ? 0 : k2/x; }
+    var fr = function(x) { return x==0 ? 0 : -k2/x; }
 
-    var t = iterations + 1;
-    var cool = function(x) { return max(x-1, 0); }
+    var cool = function(x) { return t*0.9; }
 
-    for (var i = 0 ; i < iterations ; i++) {
-        console.log('Iteration', i);
-
-        // Calculate repulsive forces
-        for (var j in V) {
-            var v = V[j];
-            v.disp_x = 0;
-            v.disp_y = 0;
-            for (var l in V) {
-                if (j != l) {
-                    var u = V[l];
-                    var delta_x = v.pos_x - u.pos_x;
-                    var delta_y = v.pos_y - u.pos_y;
-                    var delta_norm = vector_norm(delta_x, delta_y);
-                    var ddx = delta_x == 0 ? 0 : delta_x/delta_norm;
-                    var ddy = delta_y == 0 ? 0 : delta_y/delta_norm;
-                    v.disp_x = v.disp_x + ddx * fr(delta_norm);
-                    v.disp_y = v.disp_y + ddy * fr(delta_norm);
-                }
+    // Calculate repulsive forces
+    for (var j in V) {
+        var v = V[j];
+        v.disp_x = 0;
+        v.disp_y = 0;
+        for (var l in V) {
+            if (j != l) {
+                var u = V[l];
+                var delta_x = v.pos_x - u.pos_x;
+                var delta_y = v.pos_y - u.pos_y;
+                var delta_norm = vector_norm(delta_x, delta_y);
+                var ddx = delta_x == 0 ? 0 : delta_x/delta_norm;
+                var ddy = delta_y == 0 ? 0 : delta_y/delta_norm;
+                v.disp_x = v.disp_x + ddx * fr(delta_norm);
+                v.disp_y = v.disp_y + ddy * fr(delta_norm);
             }
-        } 
-
-        // Calculate attractive forces
-        for (var j in E) {
-            var e = E[j];
-            var lambda_x = e.v.pos_x - e.u.pos_x;
-            var lambda_y = e.v.pos_y - e.u.pos_y;
-            var lambda_norm = vector_norm(lambda_x, lambda_y);
-            var llx = lambda_x == 0 ? 0 : lambda_x/lambda_norm;
-            var lly = lambda_y == 0 ? 0 : lambda_y/lambda_norm;
-            var ax = llx * fa(lambda_norm);
-            var ay = lly * fa(lambda_norm);
-            e.v.disp_x = e.v.disp_x - ax;
-            e.u.disp_y = e.u.disp_y + ay;
         }
+    } 
 
-        // Limit max displacement to temperature t and 
-        // prevent from displacement outside frame
-        for (var j in V) {
-            var v = V[j];
-            var v_disp_norm = vector_norm(v.disp_x, v.disp_y);
-            var ddx = v.disp_x==0 ? 0 : v.disp_x/v_disp_norm;
-            var ddy = v.disp_y==0 ? 0 : v.disp_y/v_disp_norm;
-            v.pos_x = v.pos_x + ddx * min(v.disp_x, t);
-            v.pos_y = v.pos_y + ddy * min(v.disp_y, t);
-            v.pos_x = min(W/2, max(-W/2, v.pos_x));
-            v.pos_y = min(L/2, max(-L/2, v.pos_y));
-        } 
+    // Calculate attractive forces
+    for (var j in E) {
+        var e = E[j];
+        var lambda_x = e.v.pos_x - e.u.pos_x;
+        var lambda_y = e.v.pos_y - e.u.pos_y;
+        var lambda_norm = vector_norm(lambda_x, lambda_y);
+        var llx = lambda_x == 0 ? 0 : lambda_x/lambda_norm;
+        var lly = lambda_y == 0 ? 0 : lambda_y/lambda_norm;
+        var ax = llx * fa(lambda_norm);
+        var ay = lly * fa(lambda_norm);
+        e.v.disp_x = e.v.disp_x - ax;
+        e.v.disp_y = e.v.disp_y - ay;
+        e.u.disp_x = e.u.disp_x + ax;
+        e.u.disp_y = e.u.disp_y + ay;
+    }
 
-        // Reduce the temperature as the layout approaches a 
-        // better configuration
-        t = cool(t);
-    } // for i
+    // Limit max displacement to temperature t and 
+    // prevent from displacement outside frame
+    for (var j in V) {
+        var v = V[j];
+        var v_disp_norm = vector_norm(v.disp_x, v.disp_y);
+        var ddx = v.disp_x==0 ? 0 : v.disp_x/v_disp_norm;
+        var ddy = v.disp_y==0 ? 0 : v.disp_y/v_disp_norm;
+        v.pos_x = v.pos_x + ddx * min(v.disp_x, t);
+        v.pos_y = v.pos_y + ddy * min(v.disp_y, t);
+        v.pos_x = min(W, max(-W/2, v.pos_x));
+        v.pos_y = min(L, max(-L/2, v.pos_y));
+    } 
+
+    // Reduce the temperature as the layout approaches a 
+    // better configuration
+    t = cool(t);
 }
 
 function setup() {
     createCanvas(plotWidth+10, plotHeight+10);
+    randomSeed(100);
 
-    //frameRate(10);
-    noLoop();
+    frameRate(10);
 
     // Prepare data
     var rows = table.getRows();
-    var vertices = { };
-    var edges = [ ];
 
     for (var i = 0 ; i < rows.length ; i++) {
         var u_id = int(rows[i].getNum(0));
@@ -147,14 +151,21 @@ function setup() {
         edges.push(create_edge(u, v));
     }
 
+}
+
+function draw() {
+    background(255);
+
     // Execute algorithm
     var W = plotWidth;
     var L = plotHeight;
     var V = vertices;
     var E = edges;
-    var iterations = 10;
     
-    fr91(W, L, V, E, iterations);
+    if (t > 0 && iteration < iterations) {
+        fr91(W, L, V, E);
+        iteration++;
+    }
 
     // Draw
     textAlign(CENTER);
@@ -163,19 +174,18 @@ function setup() {
         var v = V[i];
         var x = v.pos_x;
         var y = v.pos_y;
-        //stroke(51);
         point(x, y);
-        //stroke(0);
         text(v.id, x, y-5);
     }
 
     for (var i in E) {
         var e = E[i];
+        stroke(e.r, e.g, e.b);
         line(e.u.pos_x, e.u.pos_y, e.v.pos_x, e.v.pos_y);
     }
-}
+    stroke(0);
 
-function draw() {
+    console.log('V[1]', V[1]);
 
 }
 
