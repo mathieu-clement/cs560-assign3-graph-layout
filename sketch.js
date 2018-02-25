@@ -114,12 +114,14 @@ function fr91(W, L, V, E) {
     for (var j in V) {
         var v = V[j];
         var v_disp_norm = vector_norm(v.disp_x, v.disp_y);
-        var ddx = v.disp_x==0 ? 0 : v.disp_x/v_disp_norm;
-        var ddy = v.disp_y==0 ? 0 : v.disp_y/v_disp_norm;
-        v.pos_x += ddx * min(v.disp_x, t);
-        v.pos_y += ddy * min(v.disp_y, t);
-        v.pos_x = min(W, max(-W/2, v.pos_x));
-        v.pos_y = min(L, max(-L/2, v.pos_y));
+        if (v_disp_norm > 0) {
+            var ddx = v.disp_x/v_disp_norm;
+            var ddy = v.disp_y/v_disp_norm;
+            v.pos_x += ddx * min(v.disp_x, t);
+            v.pos_y += ddy * min(v.disp_y, t);
+            v.pos_x = min(W, max(-W/2, v.pos_x));
+            v.pos_y = min(L, max(-L/2, v.pos_y));
+        }
     } 
 
     // Reduce the temperature as the layout approaches a 
