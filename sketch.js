@@ -1,7 +1,7 @@
 var table; // data loaded from csv
 
 function preload() {
-    table = loadTable('data/facebook/0.edges.csv', 'csv');
+    table = loadTable('/data/facebook/0.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
@@ -62,35 +62,31 @@ function fr91(W, L, V, E, iterations) {
 
     for (var i = 0 ; i < iterations ; i++) {
         // Calculate repulsive forces
-        for (var j = 0 ; j < V.length ; j++) { // for v in V
-            var v = V[j];
+        for (var v in V) {
             v.disp = 0;
-            for (var l = 0 ; l < V.length ; l++) {
-                var u = V[l];
-                if (l != j) { // if u != v
+            for (var u in V) {
+                if (if u != v) {
                     var delta = v.pos - u.pos;
                     v.disp = v.disp + (delta/abs(delta)) * fr(abs(delta));
-                } // if u != v
-            } // for u in V
-        } // for v in V
+                }
+            }
+        } 
 
         // Calculate attractive forces
-        for (var j = 0 ; j < E.length ; j++) { // for e in E
-            var e = E[j];
+        for (var e in E) {
             var lambda = e.v.pos - e.u.pos;
             var a = (lambda/abs(lambda)) * fa(abs(lambda));
             e.v.disp = e.v.disp - a;
             e.u.disp = e.u.disp + a;
-        } // for e in E
+        }
 
         // Limit max displacement to temperature t and 
         // prevent from displacement outside frame
-        for (var j = 0 ; j < V.length ; j++) { // for v in V
-            var v = V[j];
+        for (var v in V) {
             v.pos = v.pos + (v.disp/abs(v.disp)) * min(v.disp, t);
             v.pos_x = min(W/2, max(-W/2, v.pos_x));
             v.pos_y = min(L/2, max(-L/2, v.pos_y));
-        } // for v in V
+        } 
 
         // Reduce the temperature as the layout approaches a 
         // better configuration
