@@ -22,8 +22,8 @@ function int_array(arr) {
     return intArr;
 }
 
-var plotHeight = 350;
-var plotWidth = 500;
+var plotWidth = 1500;
+var plotHeight = 1000 ;
 
 class Vertex {
     constructor(id) {
@@ -62,7 +62,8 @@ function fr91(W, L, V, E, iterations) {
 
     for (var i = 0 ; i < iterations ; i++) {
         // Calculate repulsive forces
-        for (var v in V) {
+        for (var j in V) {
+            var v = V[j];
             v.disp = 0;
             for (var u in V) {
                 if (u != v) {
@@ -73,7 +74,8 @@ function fr91(W, L, V, E, iterations) {
         } 
 
         // Calculate attractive forces
-        for (var e in E) {
+        for (var j in E) {
+            var e = E[j];
             var lambda = e.v.pos - e.u.pos;
             var a = (lambda/abs(lambda)) * fa(abs(lambda));
             e.v.disp = e.v.disp - a;
@@ -82,7 +84,8 @@ function fr91(W, L, V, E, iterations) {
 
         // Limit max displacement to temperature t and 
         // prevent from displacement outside frame
-        for (var v in V) {
+        for (var j in V) {
+            var v = V[j];
             v.pos = v.pos + (v.disp/abs(v.disp)) * min(v.disp, t);
             v.pos_x = min(W/2, max(-W/2, v.pos_x));
             v.pos_y = min(L/2, max(-L/2, v.pos_y));
@@ -120,29 +123,39 @@ function setup() {
         edges.push(create_edge(u, v));
     }
 
-    console.log('vertices', vertices);
-    console.log('edges', edges);
-    
     // Execute algorithm
     var W = plotWidth;
     var L = plotHeight;
     var V = vertices;
     var E = edges;
     var iterations = 100;
-
+    
     fr91(W, L, V, E, iterations);
+    
+    console.log('V[1]', V[1]);
+    console.log('E[0]', E[0]);
 
     // Draw
     textAlign(CENTER);
-    for (var v in V) {
+
+    for (var i in V) {
+        var v = V[i];
         var x = v.pos_x;
         var y = v.pos_y;
+        stroke(51);
         point(x, y);
+        stroke(1);
         text(v.id, x, y-5);
+    }
+
+    for (var i in E) {
+        var e = E[i];
+        line(e.u.pos_x, e.u.pos_y, e.v.pos_x, e.v.pos_y);
     }
 }
 
 function draw() {
-    background(255);
 
 }
+
+
