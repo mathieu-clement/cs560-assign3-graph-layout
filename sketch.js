@@ -28,8 +28,8 @@ var plotHeight = 1000 ;
 class Vertex {
     constructor(id) {
         this.id = id;
-        this.pos = 0;
-        this.disp = 0;
+        this.disp_x = 0;
+        this.disp_y = 0;
         this.pos_x = int(random(plotWidth));
         this.pos_y = int(random(plotHeight));
     }
@@ -50,25 +50,40 @@ function create_edge(u, v) {
     return new Edge(u, v);
 }
 
+function vector_norm(x, y) {
+    return sqrt(x*x + y*y);
+}
 
 function fr91(W, L, V, E, iterations) {
     var area = W * L;
-    var k = sqrt(area/V.length);
+    var V_length = 0;
+    for (var v in V) V_length++;
+    var k = sqrt(area/V_length);
+    var k2 = k*k;
     var fa = function(x) { return (x*x)/k; }
-    var fr = function(x) { return (k*k)/x; }
+    var fr = function(x) { return x==0 ? 0 : k2/x; }
 
     var t = iterations + 1;
-    var cool = function(t) { return max(t-1, 0); }
+    var cool = function(x) { return max(x-1, 0); }
 
     for (var i = 0 ; i < iterations ; i++) {
+        console.log('Iteration', i);
+
         // Calculate repulsive forces
         for (var j in V) {
             var v = V[j];
-            v.disp = 0;
-            for (var u in V) {
-                if (u != v) {
-                    var delta = v.pos - u.pos;
-                    v.disp = v.disp + (delta/abs(delta)) * fr(abs(delta));
+            v.disp_x = 0;
+            v.disp_y = 0;
+            for (var l in V) {
+                if (j != l) {
+                    var u = V[l];
+                    var delta_x = v.pos_x - u.pos_x;
+                    var delta_y = v.pos_y - u.pos_y;
+                    var delta_norm = vector_norm(delta_x, delta_y);
+                    var ddx = delta_x == 0 ? 0 : delta_x/delta_norm;
+                    var ddy = delta_y == 0 ? 0 : delta_y/delta_norm;
+                    v.disp_x = v.disp_x + ddx * fr(delta_norm);
+                    v.disp_y = v.disp_y + ddy * fr(delta_norm);
                 }
             }
         } 
@@ -76,17 +91,26 @@ function fr91(W, L, V, E, iterations) {
         // Calculate attractive forces
         for (var j in E) {
             var e = E[j];
-            var lambda = e.v.pos - e.u.pos;
-            var a = (lambda/abs(lambda)) * fa(abs(lambda));
-            e.v.disp = e.v.disp - a;
-            e.u.disp = e.u.disp + a;
+            var lambda_x = e.v.pos_x - e.u.pos_x;
+            var lambda_y = e.v.pos_y - e.u.pos_y;
+            var lambda_norm = vector_norm(lambda_x, lambda_y);
+            var llx = lambda_x == 0 ? 0 : lambda_x/lambda_norm;
+            var lly = lambda_y == 0 ? 0 : lambda_y/lambda_norm;
+            var ax = llx * fa(lambda_norm);
+            var ay = lly * fa(lambda_norm);
+            e.v.disp_x = e.v.disp_x - ax;
+            e.u.disp_y = e.u.disp_y + ay;
         }
 
         // Limit max displacement to temperature t and 
         // prevent from displacement outside frame
         for (var j in V) {
             var v = V[j];
-            v.pos = v.pos + (v.disp/abs(v.disp)) * min(v.disp, t);
+            var v_disp_norm = vector_norm(v.disp_x, v.disp_y);
+            var ddx = v.disp_x==0 ? 0 : v.disp_x/v_disp_norm;
+            var ddy = v.disp_y==0 ? 0 : v.disp_y/v_disp_norm;
+            v.pos_x = v.pos_x + ddx * min(v.disp_x, t);
+            v.pos_y = v.pos_y + ddy * min(v.disp_y, t);
             v.pos_x = min(W/2, max(-W/2, v.pos_x));
             v.pos_y = min(L/2, max(-L/2, v.pos_y));
         } 
@@ -98,7 +122,7 @@ function fr91(W, L, V, E, iterations) {
 }
 
 function setup() {
-    createCanvas(plotHeight+10, plotWidth+10);
+    createCanvas(plotWidth+10, plotHeight+10);
 
     //frameRate(10);
     noLoop();
@@ -128,12 +152,9 @@ function setup() {
     var L = plotHeight;
     var V = vertices;
     var E = edges;
-    var iterations = 100;
+    var iterations = 10;
     
     fr91(W, L, V, E, iterations);
-    
-    console.log('V[1]', V[1]);
-    console.log('E[0]', E[0]);
 
     // Draw
     textAlign(CENTER);
@@ -142,9 +163,9 @@ function setup() {
         var v = V[i];
         var x = v.pos_x;
         var y = v.pos_y;
-        stroke(51);
+        //stroke(51);
         point(x, y);
-        stroke(1);
+        //stroke(0);
         text(v.id, x, y-5);
     }
 
