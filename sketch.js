@@ -65,7 +65,7 @@ function fr91(W, L, V, E, iterations) {
         for (var v in V) {
             v.disp = 0;
             for (var u in V) {
-                if (if u != v) {
+                if (u != v) {
                     var delta = v.pos - u.pos;
                     v.disp = v.disp + (delta/abs(delta)) * fr(abs(delta));
                 }
