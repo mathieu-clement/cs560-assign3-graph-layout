@@ -121,14 +121,8 @@ function fr91(W, L, V, E) {
             v.pos_x += ddx * min(v_disp_norm, t);
             v.pos_y += ddy * min(v_disp_norm, t);
 
-            //var x = v.pos_x;
-            //var y = v.pos_y;
-            //x = min(W,max(0,x)) - W/2;
-            //y =  min(L,max(0,y)) - L/2;
-            //v.pos_x = min(sqrt(W*W/4-y*y),max(-sqrt(W*W/4-y*y),x)) + W/2
-            //v.pos_y = min(sqrt(L*L/4-x*x),max(-sqrt(L*L/4-x*x),y)) + L/2
-            //v.pos_x = min(W/2, max(-W/2, v.pos_x));
-            //v.pos_y = min(L/2, max(-L/2, v.pos_y));
+            v.pos_x = min(W-30, max(30, v.pos_x));
+            v.pos_y = min(L-30, max(30, v.pos_y));
         }
     } 
 
@@ -139,7 +133,7 @@ function fr91(W, L, V, E) {
 
 function setup() {
     createCanvas(plotWidth+10, plotHeight+10);
-    randomSeed(500);
+    //randomSeed(500);
 
     frameRate(24);
 
