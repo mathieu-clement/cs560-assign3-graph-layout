@@ -1,9 +1,11 @@
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
-var t = 30.0;
 var iteration = 0;
 var iterations = 100;
+
+var plotWidth = 1200;
+var t = plotWidth / 10;
 
 function preload() {
     table = loadTable('/data/facebook/3980.edges.csv', 'csv');
@@ -27,7 +29,6 @@ function int_array(arr) {
     return intArr;
 }
 
-var plotWidth = 1200;
 var plotHeight = 600;
 
 class Vertex {
@@ -72,7 +73,7 @@ function fr91(W, L, V, E) {
     var fa = function(x) { return x*x/k; }
     var fr = function(x) { return x==0 ? 0 : k2/x; }
 
-    var cool = function(x) { return t*0.9; }
+    var cool = function(x) { return t - t/(iteration+2); }
 
     // Calculate repulsive forces
     for (var j in V) {
@@ -119,6 +120,13 @@ function fr91(W, L, V, E) {
             var ddy = v.disp_y/v_disp_norm;
             v.pos_x += ddx * min(v_disp_norm, t);
             v.pos_y += ddy * min(v_disp_norm, t);
+
+            //var x = v.pos_x;
+            //var y = v.pos_y;
+            //x = min(W,max(0,x)) - W/2;
+            //y =  min(L,max(0,y)) - L/2;
+            //v.pos_x = min(sqrt(W*W/4-y*y),max(-sqrt(W*W/4-y*y),x)) + W/2
+            //v.pos_y = min(sqrt(L*L/4-x*x),max(-sqrt(L*L/4-x*x),y)) + L/2
             //v.pos_x = min(W/2, max(-W/2, v.pos_x));
             //v.pos_y = min(L/2, max(-L/2, v.pos_y));
         }
@@ -131,7 +139,7 @@ function fr91(W, L, V, E) {
 
 function setup() {
     createCanvas(plotWidth+10, plotHeight+10);
-    randomSeed(100);
+    //randomSeed(400);
 
     frameRate(24);
 
