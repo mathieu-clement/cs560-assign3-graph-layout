@@ -139,7 +139,7 @@ function fr91(W, L, V, E) {
 
 function setup() {
     createCanvas(plotWidth+10, plotHeight+10);
-    //randomSeed(400);
+    randomSeed(500);
 
     frameRate(24);
 
