@@ -1,12 +1,12 @@
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
-var t = 20.0;
+var t = 30.0;
 var iteration = 0;
 var iterations = 100;
 
 function preload() {
-    table = loadTable('/data/facebook/686.edges.csv', 'csv');
+    table = loadTable('/data/facebook/3980.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
@@ -117,10 +117,10 @@ function fr91(W, L, V, E) {
         if (v_disp_norm > 0) {
             var ddx = v.disp_x/v_disp_norm;
             var ddy = v.disp_y/v_disp_norm;
-            v.pos_x += ddx * min(v.disp_x, t);
-            v.pos_y += ddy * min(v.disp_y, t);
-            v.pos_x = min(W, max(-W/2, v.pos_x));
-            v.pos_y = min(L, max(-L/2, v.pos_y));
+            v.pos_x += ddx * min(v_disp_norm, t);
+            v.pos_y += ddy * min(v_disp_norm, t);
+            //v.pos_x = min(W/2, max(-W/2, v.pos_x));
+            //v.pos_y = min(L/2, max(-L/2, v.pos_y));
         }
     } 
 
