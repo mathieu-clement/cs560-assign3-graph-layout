@@ -9,6 +9,9 @@ var t = plotWidth / 10;
 
 function preload() {
     table = loadTable('/data/facebook/3980.edges.csv', 'csv');
+//    table = loadTable('/data/facebook/0.edges.csv', 'csv');
+//    table = loadTable('/data/facebook/698.edges.csv', 'csv');
+//    table = loadTable('/data/facebook/1912.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
