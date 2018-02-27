@@ -1,4 +1,4 @@
-var egoNode = 3980; // 0, 698, 1912...
+var egoNode = 698; // 0, 698, 1912...
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
@@ -188,19 +188,37 @@ function draw() {
     // Draw
     for (var i in E) {
         var e = E[i];
-        stroke(e.r, e.g, e.b);
+        if (e.u.id == egoNode || e.v.id == egoNode) {
+            // Ego node: Light gray edges
+            stroke(224);
+        } else {
+            stroke(e.r, e.g, e.b);
+        }
         line(e.u.pos_x, e.u.pos_y, e.v.pos_x, e.v.pos_y);
     }
     stroke(0);
 
     textAlign(CENTER);
+    textSize(10);
 
     for (var i in V) {
         var v = V[i];
         var x = v.pos_x;
         var y = v.pos_y;
-        point(x, y);
-        text(v.id, x, y-5);
+        if (v.id == egoNode) {
+            // Ego node: Make it BIG!
+            strokeWeight(8);
+            point(x, y);
+            strokeWeight(1);
+            textSize(18);
+            text(v.id, x, y-10);
+            textSize(10);
+        } else {
+            strokeWeight(4);
+            point(x, y);
+            strokeWeight(1);
+            text(v.id, x, y-5);
+        }
     }
 
 }
