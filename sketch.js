@@ -1,4 +1,4 @@
-var egoNode = 698; // 0, 107, 348, 698, 1684, 1912, 3437, 3980...
+var egoNode; // 0, 107, 348, 414, 686, 698, 1684, 1912, 3437, 3980...
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
@@ -10,6 +10,13 @@ var plotWidth;
 var t;
 
 function preload() {
+    // Change ego node by suffixing URL with egoNode=123
+    var pEgoNode = getURLParams().egoNode;
+    if (pEgoNode) {
+        egoNode = int(pEgoNode);
+    } else {
+        egoNode = 698; // default
+    }
     table = loadTable('/data/facebook/' + egoNode + '.edges.csv', 'csv');
 }
 
