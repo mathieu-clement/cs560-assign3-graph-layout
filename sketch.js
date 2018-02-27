@@ -5,9 +5,9 @@ var edges = [ ];
 var iteration = 0;
 var iterations = 50;
 
-var plotHeight = 600;
-var plotWidth = 1200;
-var t = plotWidth / 10;
+var plotHeight;
+var plotWidth;
+var t;
 
 function preload() {
     table = loadTable('/data/facebook/' + egoNode + '.edges.csv', 'csv');
@@ -132,10 +132,15 @@ function fr91(W, L, V, E) {
 }
 
 function setup() {
-    createCanvas(plotWidth+10, plotHeight+10);
+    plotHeight = windowHeight;
+    plotWidth = windowWidth;
+    t = plotWidth / 10;
+    createCanvas(plotWidth, plotHeight);
     //randomSeed(500);
 
     frameRate(24);
+
+    noSmooth();
 
     // Prepare data
     var rows = table.getRows();
@@ -217,16 +222,18 @@ function draw() {
 
     // Ego node: Make it BIG!
     var egoVertex = vertices[egoNode];
+    push();
     fill(255, 0, 0); // red
+    push();
     stroke(255, 0, 0);
     strokeWeight(8);
     point(egoVertex.pos_x, egoVertex.pos_y);
-    stroke(0);
-    strokeWeight(1);
+    pop();
+    push();
     textSize(20);
     text(egoNode, egoVertex.pos_x, egoVertex.pos_y-10);
-    fill(0);
-    textSize(10);
+    pop();
+    pop();
 
 }
 
