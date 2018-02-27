@@ -1,17 +1,16 @@
+var egoNode = 3980; // 0, 698, 1912...
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
 var iteration = 0;
-var iterations = 100;
+var iterations = 50;
 
+var plotHeight = 600;
 var plotWidth = 1200;
 var t = plotWidth / 10;
 
 function preload() {
-    table = loadTable('/data/facebook/3980.edges.csv', 'csv');
-//    table = loadTable('/data/facebook/0.edges.csv', 'csv');
-//    table = loadTable('/data/facebook/698.edges.csv', 'csv');
-//    table = loadTable('/data/facebook/1912.edges.csv', 'csv');
+    table = loadTable('/data/facebook/' + egoNode + '.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
@@ -31,8 +30,6 @@ function int_array(arr) {
     }
     return intArr;
 }
-
-var plotHeight = 600;
 
 class Vertex {
     constructor(id) {
@@ -143,6 +140,8 @@ function setup() {
     // Prepare data
     var rows = table.getRows();
 
+    // Create Vertex and Edge objects
+    // and add them to vertices and edges data structures
     for (var i = 0 ; i < rows.length ; i++) {
         var u_id = int(rows[i].getNum(0));
         var v_id = int(rows[i].getNum(1));
@@ -158,6 +157,16 @@ function setup() {
         edges.push(create_edge(u, v));
     }
 
+    // Create a vertex for the ego node
+    var egoVertex = create_vertex(egoNode);
+    vertices[egoNode] = egoVertex;
+
+    // Create an edge from each of the other vertices to the ego node
+    for (var i in vertices) {
+        if (i == egoNode) continue;
+        var u = vertices[i];
+        edges.push(create_edge(u, egoVertex));
+    }
 }
 
 function draw() {
@@ -177,6 +186,13 @@ function draw() {
     }
 
     // Draw
+    for (var i in E) {
+        var e = E[i];
+        stroke(e.r, e.g, e.b);
+        line(e.u.pos_x, e.u.pos_y, e.v.pos_x, e.v.pos_y);
+    }
+    stroke(0);
+
     textAlign(CENTER);
 
     for (var i in V) {
@@ -186,15 +202,6 @@ function draw() {
         point(x, y);
         text(v.id, x, y-5);
     }
-
-    for (var i in E) {
-        var e = E[i];
-        stroke(e.r, e.g, e.b);
-        line(e.u.pos_x, e.u.pos_y, e.v.pos_x, e.v.pos_y);
-    }
-    stroke(0);
-
-    console.log('V[1]', V[1]);
 
 }
 
