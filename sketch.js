@@ -1,4 +1,4 @@
-var egoNode = 698; // 0, 698, 1912...
+var egoNode = 698; // 0, 107, 348, 698, 1684, 1912, 3437, 3980...
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
@@ -206,13 +206,7 @@ function draw() {
         var x = v.pos_x;
         var y = v.pos_y;
         if (v.id == egoNode) {
-            // Ego node: Make it BIG!
-            strokeWeight(8);
-            point(x, y);
-            strokeWeight(1);
-            textSize(18);
-            text(v.id, x, y-10);
-            textSize(10);
+            continue; // let's do it later so it appears on top
         } else {
             strokeWeight(4);
             point(x, y);
@@ -220,6 +214,19 @@ function draw() {
             text(v.id, x, y-5);
         }
     }
+
+    // Ego node: Make it BIG!
+    var egoVertex = vertices[egoNode];
+    fill(255, 0, 0); // red
+    stroke(255, 0, 0);
+    strokeWeight(8);
+    point(egoVertex.pos_x, egoVertex.pos_y);
+    stroke(0);
+    strokeWeight(1);
+    textSize(20);
+    text(egoNode, egoVertex.pos_x, egoVertex.pos_y-10);
+    fill(0);
+    textSize(10);
 
 }
 
