@@ -2,6 +2,9 @@ var egoNode; // 0, 107, 348, 414, 686, 698, 1684, 1912, 3437, 3980...
 var table; // data loaded from csv
 var vertices = { };
 var edges = [ ];
+var adj = { }; // adjacency list. adj[3] = [5, 7] means there is an edge
+               // from 3 to 5, and from 3 to 7
+               // Guarantee: adj[x].contains(y) == adj[y].contains(x)
 var iteration = 0;
 var iterations = 50;
 
@@ -167,6 +170,14 @@ function setup() {
         var u = vertices[u_id];
         var v = vertices[v_id];
         edges.push(create_edge(u, v));
+        
+        // Update adjacency matrix
+        if (!adj.hasOwnProperty(u_id)) 
+            adj[u_id] = [];
+        adj[u_id].push(v_id);
+        if (!adj.hasOwnProperty(v_id)) 
+            adj[v_id] = [];
+        adj[v_id].push(u_id);
     }
 
     // Create a vertex for the ego node
@@ -174,10 +185,16 @@ function setup() {
     vertices[egoNode] = egoVertex;
 
     // Create an edge from each of the other vertices to the ego node
+    adj[egoNode] = [];
     for (var i in vertices) {
         if (i == egoNode) continue;
         var u = vertices[i];
         edges.push(create_edge(u, egoVertex));
+        
+        if (!adj.hasOwnProperty(u.id))
+            adj[u.id] = [];
+        adj[u.id].push(egoNode);
+        adj[egoNode].push(u.id);
     }
 }
 
@@ -244,4 +261,28 @@ function draw() {
 
 }
 
+function mouseMoved() {
+    redraw();
 
+    var margin = 5;
+
+    for (var i in vertices) {
+        var v = vertices[i];
+        if (mouseX > v.pos_x - margin &&
+            mouseX < v.pos_x + margin &&
+            mouseY > v.pos_y - margin &&
+            mouseY < v.pos_y + margin) {
+            push();
+
+            for (var j in adj[v.id]) {
+                var u_id = adj[v.id][j];
+                var u = vertices[u_id];
+                strokeWeight(4);
+                line(v.pos_x, v.pos_y, u.pos_x, u.pos_y);
+            }
+
+            pop();
+            break;
+        }
+    }
+}
