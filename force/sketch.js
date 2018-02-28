@@ -17,7 +17,7 @@ function preload() {
     } else {
         egoNode = 698; // default
     }
-    table = loadTable('data/facebook/' + egoNode + '.edges.csv', 'csv');
+    table = loadTable('../data/facebook/' + egoNode + '.edges.csv', 'csv');
 }
 
 function unique_array(arr) {
