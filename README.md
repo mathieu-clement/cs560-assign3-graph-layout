@@ -8,9 +8,5 @@
 ## Script to convert edges file to proper CSV
 
 ```bash
-#!/bin/sh
-
-for f in $(dirname "$0")/facebook/*.edges; do
-    cat $f | tr ' ' ',' > $f.csv
-done
+cat $f | tr ' ' ',' > $f.csv
 ```
