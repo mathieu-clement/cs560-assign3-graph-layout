@@ -1,4 +1,4 @@
-# Force-directed layout and matrix representation
+# CS560 Assignment 3 - Introduction to Graph Layout Algorithms
 
 ## Force-directed layout
 
