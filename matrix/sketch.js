@@ -149,8 +149,7 @@ function draw() {
 
         for (var j in adj) {
             if (adj[i].includes(int(j))) {
-                console.log('Edge from ' + j + ' to ' + i);
-                fill(0, 128, 0);
+                fill('rgba(0, 128, 0, 0.5)');
             } else {
                 noFill();
             }
@@ -166,9 +165,47 @@ function draw() {
     pop();
 }
 
-//function mouseMoved() {
-//    redraw();
-//    push();
-//    // TODO Interactivity
-//    pop();
-//}
+function mouseMoved() {
+    redraw();
+
+    // Ignore mouse outside matrix
+    if (mouseX < margin || mouseX > margin + numVertices * cellWidth ||
+        mouseY < margin || mouseY > margin + numVertices * cellHeight) {
+        return;
+    }
+
+    push();
+    
+    // Highlight column
+    var x = margin;
+    var y = margin;
+    for (var i in adj) {
+        if (mouseX >= x && mouseX < x + cellWidth) {
+            // Found column, color all cells from column
+            fill('rgba(188,143,143,0.3)');
+            for (var j in adj) {
+                rect(x, y, cellWidth, cellHeight);
+                y += cellHeight;
+            }
+            break;
+        }
+        x += cellWidth;
+    }
+
+    // Highlight row
+    x = y = margin;
+    for (var i in adj) {
+        if (mouseY >= y && mouseY < y + cellHeight) {
+            // Found column, color all cells from row
+            fill('rgba(188,143,143,0.3)');
+            for (var j in adj) {
+                rect(x, y, cellWidth, cellHeight);
+                x += cellWidth;
+            }
+            break;
+        }
+        y += cellHeight;
+    }
+
+    pop();
+}
