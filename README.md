@@ -5,3 +5,13 @@
 [View visualization](https://bl.ocks.org/tiktaktok/raw/46e6b3530f207af68908f6cacf3e51a4/)
 
 [View Gist](https://bl.ocks.org/tiktaktok/raw/46e6b3530f207af68908f6cacf3e51a4/)
+
+## Script to convert edges file to proper CSV
+
+```bash
+#!/bin/sh
+
+for f in $(dirname "$0")/facebook/*.edges; do
+    cat $f | tr ' ' ',' > $f.csv
+done
+```
