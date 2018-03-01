@@ -107,6 +107,15 @@ function draw() {
 
         y += cellHeight;
     }
+    
+    // right column
+    textAlign(LEFT);
+    x = margin + numVertices * cellWidth;
+    y = margin;
+    for (var i in adj) {
+        text(i, x + 5, y + cellHeight*0.66);
+        y += cellHeight;
+    }
 
     x = y = margin;
     textAlign(LEFT);
@@ -120,6 +129,20 @@ function draw() {
 
         x += cellWidth;
     }
+
+    // bottom row
+    x = margin;
+    y = margin + numVertices * cellHeight;
+    textAlign(RIGHT);
+    for (var i in adj) {
+        rotate(-90);
+        text(i, -y-5, x + cellWidth*0.66);
+        rotate(90);
+
+        x += cellWidth;
+    }
+
+    x = y = margin;
 
     for (var i in adj) {
         x = margin;
