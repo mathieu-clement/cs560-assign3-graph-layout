@@ -8,5 +8,5 @@
 ## Script to convert edges file to proper CSV
 
 ```bash
-cat $f | tr ' ' ',' > $f.csv
+cat 698.edges | tr ' ' ',' > 698.edges.csv
 ```
